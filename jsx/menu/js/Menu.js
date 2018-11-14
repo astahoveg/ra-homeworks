@@ -1,5 +1,4 @@
-const Menu = function (props) {
-    const { items, opened } = props;
+const Menu = function ({items, opened}) {
     const item_list = items.map((item) => <li><a href={item.href}>{item.title}</a></li>);
     const navigation = (
         <nav>

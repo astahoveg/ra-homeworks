@@ -11,8 +11,7 @@ function getDayStr(day) {
     return days[day];
 }
 
-const CalendarHeader = function (props) {
-    const { day, date, month, year } = props;
+const CalendarHeader = function ({day, date, month, year}) {
     return (
         <div className="ui-datepicker-material-header">
             <div className="ui-datepicker-material-day">{day}</div>
@@ -25,8 +24,7 @@ const CalendarHeader = function (props) {
     );
 };
 
-const CalendarTitle = function (props) {
-    const { month, year } = props;
+const CalendarTitle = function ({month, year}) {
     return (
         <div className="ui-datepicker-header">
             <div className="ui-datepicker-title">
@@ -44,8 +42,7 @@ const CalendarTableRow = function (props) {
     );
 }
 
-const CalendarTable = function (props) {
-    const { date, month, year } = props;
+const CalendarTable = function ({date, month, year}) {
     let firstDay = new Date(year, month);
     let lastDay = new Date(year, month + 1);
     let arrayWeek = [];
