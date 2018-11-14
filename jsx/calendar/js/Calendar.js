@@ -37,10 +37,9 @@ const CalendarTitle = function (props) {
 }
 
 const CalendarTableRow = function (props) {
-    const tableTd = props.row.map((item) => <td className={item.className}>{item.day}</td>);
     return (
         <tr>
-            {tableTd}
+            {props.row.map((item) => <td className={item.className}>{item.day}</td>)}
         </tr>
     );
 }
