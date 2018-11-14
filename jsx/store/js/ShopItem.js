@@ -11,7 +11,7 @@ const ShopItem = function (props) {
             </div>
             <div className="divider" />
             <div className="purchase-info">
-                <div className="price">{item.currency + item.price}</div>
+                <div className="price">`${item.currency}${item.price}`</div>
                 <button>Добавить в корзину</button>
             </div>
         </div>

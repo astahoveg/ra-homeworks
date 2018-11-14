@@ -36,24 +36,52 @@ const CalendarTitle = function (props) {
     );
 }
 
+const CalendarTableRow = function (props) {
+    const tableTd = props.row.map((item) => <td className={item.className}>{item.day}</td>);
+    return (
+        <tr>
+            {tableTd}
+        </tr>
+    );
+}
+
 const CalendarTable = function (props) {
-    const { month, year } = props;
-    let first_day = new Date(year, month);
+    const { date, month, year } = props;
+    let firstDay = new Date(year, month);
+    let lastDay = new Date(year, month + 1);
+    let arrayWeek = [];
 
-    console.log(first_day, month);
-    console.log(first_day.getDay());
-
-    if (first_day.getDay() != 1) {
-        let day_num;
-        if (first_day.getDay() == 0) {
-            day_num = 6;
-        } else {
-            day_num = (first_day.getDay() - 1);
+    if (firstDay.getDay() != 1) {
+        let dayNum = 6; //Воскресенье
+        if (firstDay.getDay() != 0) {
+            dayNum = (firstDay.getDay() - 1);
         }
-        first_day.setDate(first_day.getDate() - day_num);
+        firstDay.setDate(firstDay.getDate() - dayNum);
     }
 
-    console.log(first_day);
+    while (firstDay) {
+        let classElement;
+
+        //если понедельник и следующий месяц, то выходим из цикла
+        if ((firstDay.getDay() == 1) && (firstDay >= lastDay)) {
+            break;
+        }
+
+        //если понедельник
+        if (firstDay.getDay() == 1) {
+            arrayWeek.push([]);
+        }
+
+        //проверяем какой сейчас месяц и день
+        if (firstDay.getMonth() != month) {
+            classElement = "ui-datepicker-other-month";
+        } else if (firstDay.getDate() == date) {
+            classElement = "ui-datepicker-today";
+        }
+
+        arrayWeek[arrayWeek.length - 1].push({ "day": firstDay.getDate(), "className": classElement });
+        firstDay.setDate(firstDay.getDate() + 1);
+    }
 
     return (
         <table className="ui-datepicker-calendar">
@@ -63,7 +91,7 @@ const CalendarTable = function (props) {
                 <col />
                 <col />
                 <col />
-                <col classNameName="ui-datepicker-week-end" />
+                <col className="ui-datepicker-week-end" />
                 <col className="ui-datepicker-week-end" />
             </colgroup>
             <thead>
@@ -78,15 +106,7 @@ const CalendarTable = function (props) {
                 </tr>
             </thead>
             <tbody>
-                <tr>
-                    <td>6</td>
-                    <td>7</td>
-                    <td className="ui-datepicker-today">8</td>
-                    <td>9</td>
-                    <td>10</td>
-                    <td>11</td>
-                    <td>12</td>
-                </tr>
+                {arrayWeek.map((item) => <CalendarTableRow row={item} />)}
             </tbody>
         </table>
     );
@@ -102,7 +122,7 @@ const Calendar = function (props) {
         <div className="ui-datepicker">
             <CalendarHeader day={getDayStr(day)} date={date} month={getMonthStr(month)} year={year} />
             <CalendarTitle month={getMonthStr(month)} year={year} />
-            <CalendarTable month={month} year={year} />
+            <CalendarTable date={date} month={month} year={year} />
         </div>
     );
 };
