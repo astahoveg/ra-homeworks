@@ -1,7 +1,6 @@
 'use strict';
 
-function Stars(props) {
-  const count = props.count;
+function Stars({count}) {
   let arrayStars = [];
 
   if ((typeof count != "number") || (count < 1) || (count > 5)) {
