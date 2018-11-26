@@ -1,9 +1,207 @@
 function getRandomInt(min, max) {
-  return Math.floor(Math.random() * (max - min)) + min;
+	return Math.floor(Math.random() * (max - min)) + min;
 }
 
 function compareNumbers(a, b) {
-  return a - b;
+	return a - b;
+}
+
+class LegendGroup extends React.Component {
+	constructor(props) {
+		super(props);
+	}
+
+	render() {
+		return (
+			<div className="Legend">
+				{this.props.labels.map((label, labelIndex) => <LegendItem color={this.props.colors[labelIndex % this.props.colors.length]} label={label} />)}
+			</div>
+		);
+	}
+}
+
+class LegendItem extends React.Component {
+	constructor(props) {
+		super(props);
+	}
+
+	render() {
+		return (
+			<div>
+				<span className="Legend--color" style={{ backgroundColor: this.props.color }} />
+				<span className="Legend--label">{this.props.label}</span>
+			</div>
+		);
+	}
+}
+
+class ChartItem extends React.Component {
+	constructor(props) {
+		super(props);
+	}
+
+	render() {
+		return (
+			<div className={`Charts--item ${this.props.className}`} style={this.props.style} key={this.props.itemIndex}>
+				<b style={{ color: this.props.color }}>{this.props.item}</b>
+			</div>
+		);
+	}
+}
+
+class Chart extends React.Component {
+	constructor(props) {
+		super(props);
+	}
+
+	render() {
+		return (
+			<div className={`Charts--serie ${this.props.className}`} key={this.props.serieIndex} style={{ height: (this.props.type == "vertical") ? 250 : 'auto' }}>
+				<label>{this.props.label}</label>
+				{this.props.children}
+			</div>
+		);
+	}
+}
+
+class DefaultCharts extends React.Component {
+	constructor(props) {
+		super(props);
+	}
+
+	render() {
+		return (
+			<div className="Charts">
+				{this.props.data.map((serie, serieIndex) => {
+					var sortedSerie = serie.slice(0),
+						sum = serie.reduce((carry, current) => carry + current, 0);
+
+					sortedSerie.sort(compareNumbers);
+
+					return (
+						<Chart className={this.props.className} type={this.props.type} label={this.props.labels[serieIndex]} serieIndex={serieIndex}>
+							{serie.map((item, itemIndex) => {
+								var color = this.props.colors[itemIndex], style,
+									size = item / (this.props.max) * 100;
+
+								style = {
+									backgroundColor: color,
+									opacity: item / this.props.max + .05,
+									zIndex: item,
+									height: size + '%'
+								};
+
+								return (
+									<ChartItem style={style} item={item} itemIndex={itemIndex} color={color} className={this.props.className} />
+								);
+							})}
+						</Chart>
+					);
+				})}
+			</div>
+		);
+	};
+}
+
+class LayeredCharts extends React.Component {
+	constructor(props) {
+		super(props);
+	}
+
+	render() {
+		return (
+			<div className="Charts">
+				{this.props.data.map((serie, serieIndex) => {
+					var sortedSerie = serie.slice(0),
+						sum = serie.reduce((carry, current) => carry + current, 0);
+
+					sortedSerie.sort(compareNumbers);
+
+					return (
+						<Chart className={this.props.className} type={this.props.type} label={this.props.labels[serieIndex]} serieIndex={serieIndex}>
+							{serie.map((item, itemIndex) => {
+								var color = this.props.colors[itemIndex], style,
+									size = item / (this.props.max) * 100;
+
+								style = {
+									backgroundColor: color,
+									opacity: (item / this.props.max + .05),
+									zIndex: item,
+									height: size + '%',
+									right: ((sortedSerie.indexOf(item) / (serie.length + 1)) * 100) + '%'
+								};
+
+								return (
+									<ChartItem style={style} item={item} itemIndex={itemIndex} color={color} className={this.props.className} />
+								);
+							})}
+						</Chart>
+					);
+				})}
+			</div>
+		);
+	};
+}
+
+class StackedCharts extends React.Component {
+	constructor(props) {
+		super(props);
+	}
+
+	render() {
+		return (
+			<div className={`Charts ${(this.props.type == "horizontal") ? "horizontal" : null}`}>
+				{this.props.data.map((serie, serieIndex) => {
+					var sortedSerie = serie.slice(0),
+						sum = serie.reduce((carry, current) => carry + current, 0);
+
+					sortedSerie.sort(compareNumbers);
+
+					return (
+						<Chart className={(this.props.type == "horizontal") ? null : this.props.className} type={this.props.type} label={this.props.labels[serieIndex]} serieIndex={serieIndex}>
+							{serie.map((item, itemIndex) => {
+								var color = this.props.colors[itemIndex], style,
+									size = (this.props.type == "horizontal") ? (item / (this.props.max) * 100) : (item / sum * 100);
+
+								style = {
+									backgroundColor: color,
+									opacity: (this.props.type == "horizontal") ? (item / this.props.max + .05) : 1,
+									zIndex: item,
+									height: size + '%'
+								};
+
+								return (
+									<ChartItem style={style} item={item} itemIndex={itemIndex} color={color} className={(this.props.type == "horizontal") ? null : this.props.className} />
+								);
+							})}
+						</Chart>
+					);
+				})}
+			</div>
+		);
+	};
+}
+
+class ChartsGroup extends React.Component {
+	constructor(props) {
+		super(props);
+	}
+
+	render() {
+		let Charts;
+
+		if (this.props.className == "stacked") {
+			Charts = StackedCharts;
+		} else if (this.props.className == "layered") {
+			Charts = LayeredCharts;
+		} else {
+			Charts = DefaultCharts;
+		}
+
+		return (
+			<Charts {...this.props} />
+		);
+	}
 }
 
 class App extends React.Component {
@@ -22,11 +220,11 @@ class App extends React.Component {
 	}
 
 	populateArray() {
-		const	series = 5;
+		const series = 5;
 		const serieLength = 5;
 
-    let data = new Array(series).fill(new Array(serieLength).fill(0));
-    data = data.map(serie => serie.map(item => getRandomInt(0, 20)));
+		let data = new Array(series).fill(new Array(serieLength).fill(0));
+		data = data.map(serie => serie.map(item => getRandomInt(0, 20)));
 
 		this.setState({ data });
 	}
@@ -34,180 +232,133 @@ class App extends React.Component {
 	render() {
 		const { data, colors, labels, series } = this.state;
 		const max = data.reduce((max, serie) => Math.max(max, serie.reduce((serieMax, item) => Math.max(serieMax, item), 0)), 0);
+		const arrayChartsGroup = [
+			{ type: "vertical", className: null },
+			{ type: "vertical", className: "stacked" },
+			{ type: "vertical", className: "layered" },
+			{ type: "horizontal", className: "stacked" }
+		];
 
 		return (
 			<section>
-        <div className="Charts">
-          { data.map((serie, serieIndex) => {
-            var sortedSerie = serie.slice(0),
-              sum;
+				{arrayChartsGroup.map(item => <ChartsGroup data={data} colors={colors} labels={labels} max={max} series={series} type={item.type} className={item.className} />)}
+				<div className="Charts">
+					{data.map((serie, serieIndex) => {
+						var sortedSerie = serie.slice(0),
+							sum;
 
-            sum = serie.reduce((carry, current) => carry + current, 0);
-            sortedSerie.sort(compareNumbers);
+						sum = serie.reduce((carry, current) => carry + current, 0);
+						sortedSerie.sort(compareNumbers);
 
-            return (
-              <div className="Charts--serie"
-                key={ serieIndex }
-                style={{height: 250}}
-              >
-              <label>{ labels[serieIndex] }</label>
-              { serie.map((item, itemIndex) => {
-                var color = colors[itemIndex], style,
-                  size = item / (max) * 100;
+						return (
+							<div className="Charts--serie"
+								key={serieIndex}
+								style={{ height: 250 }}
+							>
+								<label>{labels[serieIndex]}</label>
+								{serie.map((item, itemIndex) => {
+									var color = colors[itemIndex], style,
+										size = item / (max) * 100;
 
-                style = {
-                  backgroundColor: color,
-                  opacity: item/max + .05,
-                  zIndex: item,
-                  height: size + '%'
-                };
+									style = {
+										backgroundColor: color,
+										opacity: item / max + .05,
+										zIndex: item,
+										height: size + '%'
+									};
 
-              return (
-                <div
-                  className="Charts--item"
-                  style={ style }
-                  key={ itemIndex }
-                >
-                  <b style={{ color: color }}>{ item }</b>
-                 </div>
-              );
-              }) }
-              </div>
-            );
-          }) }
-        </div>
+									return (
+										<div
+											className="Charts--item"
+											style={style}
+											key={itemIndex}
+										>
+											<b style={{ color: color }}>{item}</b>
+										</div>
+									);
+								})}
+							</div>
+						);
+					})}
+				</div>
 
-        <div className="Charts">
-  				{ data.map((serie, serieIndex) => {
-  				 	var sortedSerie = serie.slice(0),
-  				 		sum;
+				<div className="Charts">
+					{data.map((serie, serieIndex) => {
+						var sortedSerie = serie.slice(0),
+							sum;
 
-  				 	sum = serie.reduce((carry, current) => carry + current, 0);
-  				 	sortedSerie.sort(compareNumbers);
+						sum = serie.reduce((carry, current) => carry + current, 0);
+						sortedSerie.sort(compareNumbers);
 
-  					return (
-  						<div className="Charts--serie stacked"
-  				 			key={ serieIndex }
-  							style={{ height: 250 }}
-  						>
-  						<label>{ labels[serieIndex] }</label>
-  						{ serie.map((item, itemIndex) => {
-  							var color = colors[itemIndex], style,
-  								size = item / sum * 100;
+						return (
+							<div className="Charts--serie stacked"
+								key={serieIndex}
+								style={{ height: 250 }}
+							>
+								<label>{labels[serieIndex]}</label>
+								{serie.map((item, itemIndex) => {
+									var color = colors[itemIndex], style,
+										size = item / sum * 100;
 
-  							style = {
-  								backgroundColor: color,
-  								opacity: 1,
-  								zIndex: item,
-                  height: size + '%'
-  							};
+									style = {
+										backgroundColor: color,
+										opacity: 1,
+										zIndex: item,
+										height: size + '%'
+									};
 
-  						 return (
-  							 <div
-  							 	className="Charts--item stacked"
-  							 	style={ style }
-  								key={ itemIndex }
-  							>
-  							 	<b style={{ color: color }}>{ item }</b>
-  							 </div>
-  						);
-  						}) }
-  						</div>
-  					);
-  				}) }
-  			</div>
+									return (
+										<ChartItem style={style} item={item} itemIndex={itemIndex} color={color} className="stacked" />
+									);
+								})}
+							</div>
+						);
+					})}
+				</div>
 
-        <div className="Charts">
-  				{ data.map((serie, serieIndex) => {
-  				 	var sortedSerie = serie.slice(0),
-  				 		sum;
 
-  				 	sum = serie.reduce((carry, current) => carry + current, 0);
-  				 	sortedSerie.sort(compareNumbers);
 
-  					return (
-  						<div className="Charts--serie layered"
-  				 			key={ serieIndex }
-  							style={{ height: 250 }}
-  						>
-  						<label>{ labels[serieIndex] }</label>
-  						{ serie.map((item, itemIndex) => {
-  							var color = colors[itemIndex], style,
-  								size = item / (max) * 100;
+				<div className="Charts horizontal">
+					{data.map((serie, serieIndex) => {
+						var sortedSerie = serie.slice(0),
+							sum;
 
-  							style = {
-  								backgroundColor: color,
-  								opacity: (item/max + .05),
-  								zIndex: item,
-                  height: size + '%',
-                  right: ((sortedSerie.indexOf(item) / (serie.length + 1)) * 100) + '%'
-  							};
+						sum = serie.reduce((carry, current) => carry + current, 0);
+						sortedSerie.sort(compareNumbers);
 
-  						 return (
-  							 <div
-  							 	className="Charts--item layered"
-  							 	style={ style }
-  								key={ itemIndex }
-  							>
-  							 	<b style={{ color: color }}>{ item }</b>
-  							 </div>
-  						);
-  						}) }
-  						</div>
-  					);
-  				}) }
-  			</div>
+						return (
+							<div className="Charts--serie"
+								key={serieIndex}
+								style={{ height: 'auto' }}
+							>
+								<label>{series[serieIndex]}</label>
+								{serie.map((item, itemIndex) => {
+									var color = colors[itemIndex], style,
+										size = item / (max) * 100;
 
-        <div className="Charts horizontal">
-  				{ data.map((serie, serieIndex) => {
-  				 	var sortedSerie = serie.slice(0),
-  				 		sum;
+									style = {
+										backgroundColor: color,
+										opacity: (item / max + .05),
+										zIndex: item,
+										width: size + '%'
+									};
 
-  				 	sum = serie.reduce((carry, current) => carry + current, 0);
-  				 	sortedSerie.sort(compareNumbers);
+									return (
+										<div
+											className="Charts--item"
+											style={style}
+											key={itemIndex}
+										>
+											<b style={{ color: color }}>{item}</b>
+										</div>
+									);
+								})}
+							</div>
+						);
+					})}
+				</div>
 
-  					return (
-  						<div className="Charts--serie"
-  				 			key={ serieIndex }
-  							style={{ height: 'auto' }}
-  						>
-  						<label>{ series[serieIndex] }</label>
-  						{ serie.map((item, itemIndex) => {
-  							var color = colors[itemIndex], style,
-  								size = item / (max) * 100;
-
-  							style = {
-  								backgroundColor: color,
-  								opacity: (item/max + .05),
-  								zIndex: item,
-                  width: size + '%'
-  							};
-
-  						 return (
-  							 <div
-  							 	className="Charts--item"
-  							 	style={ style }
-  								key={ itemIndex }
-  							>
-  							 	<b style={{ color: color }}>{ item }</b>
-  							 </div>
-  						);
-  						}) }
-  						</div>
-  					);
-  				}) }
-  			</div>
-
-        <div className="Legend">
-    			{ labels.map((label, labelIndex) => {
-    				return (
-    				<div>
-    					<span className="Legend--color" style={{ backgroundColor: colors[labelIndex % colors.length]  }} />
-    					<span className="Legend--label">{ label }</span>
-    				</div>
-    				);
-    			}) }
-    		</div>
+				<LegendGroup labels={labels} colors={colors} />
 			</section>
 		);
 	}
