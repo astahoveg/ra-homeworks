@@ -56,7 +56,7 @@ class Chart extends React.Component {
 
 	render() {
 		return (
-			<div className={`Charts--serie ${this.props.className}`} key={this.props.serieIndex} style={{ height: (this.props.type == "vertical") ? 250 : 'auto' }}>
+			<div className={`Charts--serie ${this.props.className}`} key={this.props.serieIndex} style={{ height: this.props.height }}>
 				<label>{this.props.label}</label>
 				{this.props.children}
 			</div>
@@ -70,6 +70,8 @@ class DefaultCharts extends React.Component {
 	}
 
 	render() {
+		const heightChart = 250;
+
 		return (
 			<div className="Charts">
 				{this.props.data.map((serie, serieIndex) => {
@@ -79,7 +81,7 @@ class DefaultCharts extends React.Component {
 					sortedSerie.sort(compareNumbers);
 
 					return (
-						<Chart className={this.props.className} type={this.props.type} label={this.props.labels[serieIndex]} serieIndex={serieIndex}>
+						<Chart label={this.props.labels[serieIndex]} serieIndex={serieIndex} height={heightChart}>
 							{serie.map((item, itemIndex) => {
 								var color = this.props.colors[itemIndex], style,
 									size = item / (this.props.max) * 100;
@@ -92,7 +94,7 @@ class DefaultCharts extends React.Component {
 								};
 
 								return (
-									<ChartItem style={style} item={item} itemIndex={itemIndex} color={color} className={this.props.className} />
+									<ChartItem style={style} item={item} itemIndex={itemIndex} color={color} />
 								);
 							})}
 						</Chart>
@@ -109,6 +111,8 @@ class LayeredCharts extends React.Component {
 	}
 
 	render() {
+		const heightChart = 250;
+
 		return (
 			<div className="Charts">
 				{this.props.data.map((serie, serieIndex) => {
@@ -118,7 +122,7 @@ class LayeredCharts extends React.Component {
 					sortedSerie.sort(compareNumbers);
 
 					return (
-						<Chart className={this.props.className} type={this.props.type} label={this.props.labels[serieIndex]} serieIndex={serieIndex}>
+						<Chart className={this.props.type} label={this.props.labels[serieIndex]} serieIndex={serieIndex} height={heightChart}>
 							{serie.map((item, itemIndex) => {
 								var color = this.props.colors[itemIndex], style,
 									size = item / (this.props.max) * 100;
@@ -132,7 +136,7 @@ class LayeredCharts extends React.Component {
 								};
 
 								return (
-									<ChartItem style={style} item={item} itemIndex={itemIndex} color={color} className={this.props.className} />
+									<ChartItem style={style} item={item} itemIndex={itemIndex} color={color} className={this.props.type} />
 								);
 							})}
 						</Chart>
@@ -149,6 +153,8 @@ class StackedCharts extends React.Component {
 	}
 
 	render() {
+		const heightChart = 250;
+
 		return (
 			<div className="Charts">
 				{this.props.data.map((serie, serieIndex) => {
@@ -158,10 +164,7 @@ class StackedCharts extends React.Component {
 					sortedSerie.sort(compareNumbers);
 
 					return (
-						<Chart className={this.props.className}
-							type={this.props.type}
-							label={this.props.labels[serieIndex]}
-							serieIndex={serieIndex}>
+						<Chart className={this.props.type} label={this.props.labels[serieIndex]} serieIndex={serieIndex} height={heightChart}>
 							{serie.map((item, itemIndex) => {
 								var color = this.props.colors[itemIndex], style,
 									size = item / sum * 100;
@@ -174,7 +177,7 @@ class StackedCharts extends React.Component {
 								};
 
 								return (
-									<ChartItem style={style} item={item} itemIndex={itemIndex} color={color} className={this.props.className} />
+									<ChartItem style={style} item={item} itemIndex={itemIndex} color={color} className={this.props.type} />
 								);
 							})}
 						</Chart>
@@ -191,6 +194,8 @@ class HorizontalCharts extends React.Component {
 	}
 
 	render() {
+		heightChart = 'auto';
+
 		return (
 			<div className="Charts horizontal">
 				{this.props.data.map((serie, serieIndex) => {
@@ -200,9 +205,7 @@ class HorizontalCharts extends React.Component {
 					sortedSerie.sort(compareNumbers);
 
 					return (
-						<Chart type={this.props.type}
-							label={this.props.labels[serieIndex]}
-							serieIndex={serieIndex}>
+						<Chart label={this.props.labels[serieIndex]} serieIndex={serieIndex} height={heightChart}>
 							{serie.map((item, itemIndex) => {
 								var color = this.props.colors[itemIndex], style,
 									size = item / (this.props.max) * 100;
@@ -236,16 +239,13 @@ class ChartsGroup extends React.Component {
 
 		if (this.props.type == "horizontal") {
 			Charts = HorizontalCharts;
+		} else if (this.props.type == "stacked") {
+			Charts = StackedCharts;
+		} else if (this.props.type == "layered") {
+			Charts = LayeredCharts;
 		} else {
-			if (this.props.className == "stacked") {
-				Charts = StackedCharts;
-			} else if (this.props.className == "layered") {
-				Charts = LayeredCharts;
-			} else {
-				Charts = DefaultCharts;
-			}
+			Charts = DefaultCharts;
 		}
-
 
 		return (
 			<Charts {...this.props} />
@@ -282,15 +282,15 @@ class App extends React.Component {
 		const { data, colors, labels, series } = this.state;
 		const max = data.reduce((max, serie) => Math.max(max, serie.reduce((serieMax, item) => Math.max(serieMax, item), 0)), 0);
 		const arrayChartsGroup = [
-			{ type: "vertical", className: null },
-			{ type: "vertical", className: "stacked" },
-			{ type: "vertical", className: "layered" },
-			{ type: "horizontal", className: null }
+			{ type: "default" },
+			{ type: "stacked" },
+			{ type: "layered" },
+			{ type: "horizontal" }
 		];
 
 		return (
 			<section>
-				{arrayChartsGroup.map(item => <ChartsGroup data={data} colors={colors} labels={labels} max={max} series={series} type={item.type} className={item.className} />)}
+				{arrayChartsGroup.map(item => <ChartsGroup data={data} colors={colors} labels={labels} max={max} series={series} type={item.type} />)}
 				<LegendGroup labels={labels} colors={colors} />
 			</section>
 		);
