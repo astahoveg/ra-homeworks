@@ -42,14 +42,45 @@ const Form = (props) => {
   )
 };
 
-Form.propTypes = {
-  handleSubmit: PropTypes.func,
-  handleChange: PropTypes.func,
+const emailPropType = (props, propName, componentName) => {
+  let email = props[propName];
+  let isEmail = (typeof email === 'string') && /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,4}$/.test(email);
+  
+  // Если не email
+  if(!isEmail) {
+    return new Error(`Invalid prop ${propName} supplied to
+    ${componentName}. Expecting something like email. Validation failed`);
+  }
+  // Если все хорошо
+  return null;
+}
 
-  email: PropTypes.number,
-  first_name: PropTypes.string,
-  last_name: PropTypes.string,
-  age: PropTypes.integer,
-  nickname: PropTypes.string,
-  is_married: PropTypes.integer
+const createChainableTypeChecker = (validate) => {
+  const checkType = (isRequired, props, propName, componentName) => {
+    if (props[propName] === null) {
+      if (isRequired) {
+        return new Error(`The prop ${propName}
+         is marked as required in ${componentName}, but its value is \`${props[propName]}\``);
+      }
+      return null;
+    } else {
+      return validate(props, propName, componentName);
+    }
+  }
+
+  let chainedCheckType = checkType.bind(null, false);
+  chainedCheckType.isRequired = checkType.bind(null, true);
+  return chainedCheckType;
+}
+
+Form.propTypes = {
+    handleSubmit: PropTypes.func.isRequired,
+    handleChange: PropTypes.func.isRequired,
+
+    email: createChainableTypeChecker(emailPropType).isRequired,
+    first_name: PropTypes.string,
+    last_name: PropTypes.string,
+    age: PropTypes.number.isRequired,
+    nickname: PropTypes.string,
+    is_married: PropTypes.bool
 };
