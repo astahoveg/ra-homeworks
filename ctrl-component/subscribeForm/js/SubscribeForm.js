@@ -2,12 +2,16 @@ class SubscribeForm extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
-      validEmail: true
+      validEmail: true,
+      email: null
     };
   }
 
   onChange = (event) => {
-    this.setState({ validEmail: event.currentTarget.validity.valid });
+    this.setState({
+      validEmail: event.currentTarget.validity.valid,
+      email: event.currentTarget.value
+    });
   };
 
   render() {
@@ -17,7 +21,7 @@ class SubscribeForm extends React.Component {
           <h4 className="form-title">Подписаться:</h4>
           <div className="form-group">
             <label for="input-email" className="sr-only">Email</label>
-            <input type="email" id="input-email" placeholder="Email" className="form-control" onChange={this.onChange} />
+            <input type="email" id="input-email" placeholder="Email" className="form-control" onChange={this.onChange} value={this.state.email} />
             <div className="form-error">Пожалуйста, проверьте корректность адреса электронной почты</div>
             <button type="submit" className="form-next">
               <i className="material-icons">keyboard_arrow_right</i>
