@@ -5,7 +5,21 @@ const TextInput = props => {
     <div className="form-group">
       <label>{props.label}</label>
       <input type={props.type} className="form-control" name={props.name} onChange={props.onChange}
-             value={props.value} required={props.required}/>
+        value={props.value} required={props.required} />
     </div>
   )
+};
+
+TextInput.propTypes = {
+  onChange: PropTypes.func,
+
+  label: PropTypes.string.isRequired,
+  type: PropTypes.oneOf(['text', 'email', 'password', 'number']).isRequired, //Можно добавить и остальные поддерживаемые типы 
+  name: PropTypes.string.isRequired,
+  value: PropTypes.string,
+  required: PropTypes.bool
+}
+
+TextInput.defaultProps = {
+  type: "text"
 };
