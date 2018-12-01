@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="ru">
+
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -7,6 +8,7 @@
   <title>Tabs</title>
   <link rel="stylesheet" href="./css/main.css">
 </head>
+
 <body>
   <div id="root"></div>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/react/15.3.1/react.min.js"></script>
@@ -16,6 +18,8 @@
   <script type="text/babel" src="./js/Essay.js"></script>
   <script type="text/babel" src="./js/Creator.js"></script>
   <script type="text/babel" src="./js/Fortune.js"></script>
+  <script type="text/babel" src="./js/Menu.js"></script>
+  <script type="text/babel" src="./js/Content.js"></script>
   <script type="text/babel" src="./js/App.js"></script>
   <script type="text/babel">
     const ReactRouter = window.ReactRouterDOM;
@@ -24,6 +28,12 @@
     const NavLink = ReactRouter.NavLink;
     const Link = ReactRouter.Link;
     const Switch = ReactRouter.Switch;
+
+    const data = [
+      { name: "Рефераты", href: "/", component: "essay" },
+      { name: "Криэйтор", href: "/creator", component: "creator" },
+      { name: "Гадалка", href: "/fortune", component: "fortune" }
+    ];
   
     ReactDOM.render(
       <App/>,
@@ -31,4 +41,5 @@
     );
   </script>
 </body>
+
 </html>
