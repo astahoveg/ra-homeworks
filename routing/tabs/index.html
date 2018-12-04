@@ -30,9 +30,9 @@
     const Switch = ReactRouter.Switch;
 
     const data = [
-      { name: "Рефераты", href: "/", component: "essay" },
-      { name: "Криэйтор", href: "/creator", component: "creator" },
-      { name: "Гадалка", href: "/fortune", component: "fortune" }
+      { name: "Рефераты", href: "/", component: "essay", exact: true },
+      { name: "Криэйтор", href: "/creator", component: "creator", exact: false },
+      { name: "Гадалка", href: "/fortune", component: "fortune", exact: false }
     ];
   
     ReactDOM.render(
