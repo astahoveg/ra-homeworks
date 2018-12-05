@@ -1,6 +1,5 @@
 'use strict';
 
-//12 минут назад если прошло меньше часа, 5 часов назад если прошло больше часа, X дней назад если больше суток.
 function strToDate(str) {
   return new Date(str.substr(0,4),+str.substr(5,2)-1,str.substr(8,2),str.substr(11,2),str.substr(14,2),str.substr(17,2));
 }
@@ -26,9 +25,7 @@ function replaceDate(date) {
 
 function strDateTime(Component) {
     return function (props, ...args) {
-        console.log("strDateTime", props);
         props.date = replaceDate(strToDate(props.date));
-        console.log("strDateTime new", props);
         return Component.apply(this, [props, ...args]);
     }
 }
