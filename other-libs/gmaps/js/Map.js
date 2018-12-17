@@ -1,25 +1,35 @@
 class Map extends React.Component {
   constructor(props) {
     super(props);
-
-    this.state = {
-      points: [],
-    };
-  }
-
-  componentWillMount() {
-    this.setState({ points: this.props.points });
-  };
-  
-  render() {
-    console.log("render", this.props, this.props.points, this.state);
-    return (
-      <div id="map" />
-    );
+    this.state = { map: null };
   }
 
   componentDidMount() {
-    console.log("componentDidMount", this.props, this.props.points, this.state);
-	  const map = new google.maps.Map(document.getElementById("map"));
+    this.setState({
+      map: new google.maps.Map(document.getElementById('map'))
+    });
+  }
+
+  componentDidUpdate() {
+    this.state.map.setZoom(5);
+    this.props.points.forEach(p => new google.maps.Marker({
+      map: this.state.map,
+      position: p,
+      visible: true
+    }));
+    this.state.map.setCenter({ lng: 0, lat: 0 });
+  }
+
+  componentWillUnmount() {
+    this.map.destroy();
+  }
+
+  render() {
+    return (
+      <div id='mapParent'>
+        Карта
+        <div id='map'></div>
+      </div>
+    );
   }
 }

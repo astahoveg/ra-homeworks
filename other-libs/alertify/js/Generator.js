@@ -14,6 +14,10 @@ class Site extends React.Component {
     this.generate();
   }
 
+  componentDidUpdate() {
+    alertify.success(this.state.ids[this.state.ids.length - 1].length, 10000);
+  }
+
   render() {
     return (
       <div className="row">

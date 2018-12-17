@@ -32,7 +32,7 @@ class Site extends React.Component {
   getOffices() {
     this.setState({
       offices: new Array(random(1, 15, false)).fill(0)
-        .map(() => ({ lon: random(-180, 180), lat: random(-90, 90) })),
+        .map(() => ({ lng: random(-180, 180), lat: random(-90, 90) })),
     })
   }
 }
